@@ -548,49 +548,8 @@ document.addEventListener('DOMContentLoaded', function() {
         lazyImages.forEach(img => lazyLoadObserver.observe(img));
     }
 
-    // Scroll to top functionality
-    function initializeScrollToTop() {
-        const scrollToTopBtn = document.createElement('button');
-        scrollToTopBtn.innerHTML = '&uarr;';
-        scrollToTopBtn.className = 'scroll-to-top';
-        document.body.appendChild(scrollToTopBtn);
 
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 100) {
-                scrollToTopBtn.classList.add('show');
-            } else {
-                scrollToTopBtn.classList.remove('show');
-            }
-        });
-
-        scrollToTopBtn.addEventListener('click', () => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-    }
-
-    // Theme switcher functionality
-    function initializeThemeSwitcher() {
-        const themeSwitcher = document.createElement('button');
-        themeSwitcher.innerHTML = '🌓';
-        themeSwitcher.className = 'theme-switcher';
-        document.body.appendChild(themeSwitcher);
-
-        themeSwitcher.addEventListener('click', () => {
-            document.body.classList.toggle('dark-theme');
-            localStorage.setItem('theme', document.body.classList.contains('dark-theme') ? 'dark' : 'light');
-        });
-
-        // Check for saved theme preference or prefer-color-scheme
-        const savedTheme = localStorage.getItem('theme');
-        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-            document.body.classList.add('dark-theme');
-        }
-    }
+ 
 
     // Mobile scroll interactions
     function initializeMobileScrollInteractions() {
