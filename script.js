@@ -2,6 +2,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize GSAP and ScrollTrigger
     gsap.registerPlugin(ScrollTrigger);
 
+    // Check if device is mobile
+    const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
     // Loader animation
     function animateLoader() {
         const loadingContainer = document.querySelector('.loading-container');
@@ -129,6 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const parallaxContainer = document.querySelector('.parallax-container');
         
         function handleParallax() {
+            if (isMobile) return; // Disable parallax on mobile
             const scrolled = window.pageYOffset;
             const val = scrolled * 0.5;
             parallaxContainer.style.transform = `translate3d(0, ${val}px, 0)`;
@@ -140,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize Lenis for smooth scrolling
     function initializeLenis() {
         const lenis = new Lenis({
-            duration: 1.2,
+            duration: isMobile ? 1 : 1.2,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             direction: 'vertical',
             gestureDirection: 'vertical',
@@ -221,17 +225,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 const design = designs[designId];
                 
                 // Animate the model image
-                modelImage.style.transform = 'scale(1.05)';
-                setTimeout(() => {
-                    modelImage.style.transform = 'scale(1)';
-                }, 500);
+                gsap.to(modelImage, {
+                    scale: 1.05,
+                    duration: 0.3,
+                    ease: "power2.out",
+                    onComplete: () => {
+                        gsap.to(modelImage, {
+                            scale: 1,
+                            duration: 0.3,
+                            ease: "power2.in"
+                        });
+                    }
+                });
 
                 // Change the garment overlay
-                garmentOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    garmentOverlay.style.backgroundImage = `url(${design.image})`;
-                    garmentOverlay.style.opacity = '1';
-                }, 250);
+                gsap.to(garmentOverlay, {
+                    opacity: 0,
+                    duration: 0.3,
+                    onComplete: () => {
+                        garmentOverlay.style.backgroundImage = `url(${design.image})`;
+                        gsap.to(garmentOverlay, {
+                            opacity: 1,
+                            duration: 0.3
+                        });
+                    }
+                });
 
                 // Update design info
                 designName.textContent = design.name;
@@ -385,150 +403,172 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // GSAP ScrollTrigger Animations
     function initializeScrollAnimations() {
-        // Hero Section Animation
-        gsap.to('.hero-content', {
-            opacity: 0,
-            y: -50,
-            scrollTrigger: {
-                trigger: '.hero',
-                start: 'top top',
-                end: 'bottom top',
-                scrub: true
+        ScrollTrigger.matchMedia({
+            // Desktop
+            "(min-width: 769px)": function() {
+                // Hero Section Animation
+                gsap.to('.hero-content', {
+                    opacity: 0,
+                    y: -50,
+                    scrollTrigger: {
+                        trigger: '.hero',
+                        start: 'top top',
+                        end: 'bottom top',
+                        scrub: true
+                    }
+                });
+
+                // Featured Collections Animation
+                gsap.from('.collection-item', {
+                    opacity: 0,
+                    y: 50,
+                    duration: 1,
+                    stagger: 0.2,
+                    scrollTrigger: {
+                        trigger: '.collections-grid',
+                        start: 'top bottom-=100',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+
+                // Virtual Try-On Section Animation
+                gsap.from('.model-container', {
+                    x: -100,
+                    opacity: 0,
+                    duration: 1,
+                    scrollTrigger: {
+                        trigger: '.virtual-try-on',
+                        start: 'top center',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+
+                gsap.from('.controls-container', {
+                    x: 100,
+                    opacity: 0,
+                    duration: 1,
+                    scrollTrigger: {
+                        trigger: '.virtual-try-on',
+                        start: 'top center',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+
+                // Testimonials Animation
+                gsap.from('.testimonial-card', {
+                    opacity: 0,
+                    y: 50,
+                    duration: 1,
+                    stagger: 0.2,
+                    scrollTrigger: {
+                        trigger: '.testimonial-grid',
+                        start: 'top bottom-=100',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+
+                // Video Showcase Animation
+                gsap.from('.video-main', {
+                    scale: 0.8,
+                    opacity: 0,
+                    duration: 1,
+                    scrollTrigger: {
+                        trigger: '.video-showcase',
+                        start: 'top center',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+
+                gsap.utils.toArray('.timeline-item').forEach((item, index) => {
+                    gsap.from(item, {
+                        opacity: 0,
+                        x: index % 2 === 0 ? -50 : 50,
+                        duration: 1,
+                        scrollTrigger: {
+                            trigger: item,
+                            start: 'top bottom-=50',
+                            toggleActions: 'play none none reverse'
+                        }
+                    });
+                });
+
+                // What's New Section Animation
+                gsap.from('.whats-new-slide', {
+                    opacity: 0,
+                    y: 50,
+                    duration: 1,
+                    stagger: 0.2,
+                    scrollTrigger: {
+                        trigger: '.whats-new-carousel',
+                        start: 'top bottom-=100',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+
+                // Fashion Fusion Gallery Animation
+                gsap.from('.gallery-item', {
+                    opacity: 0,
+                    y: 50,
+                    duration: 1,
+                    stagger: 0.2,
+                    scrollTrigger: {
+                        trigger: '.gallery-grid',
+                        start: 'top bottom-=100',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+
+                // Footer Animation
+                gsap.from('.site-footer', {
+                    opacity: 0,
+                    y: 50,
+                    duration: 1,
+                    scrollTrigger: {
+                        trigger: '.site-footer',
+                        start: 'top bottom',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+            },
+            // Mobile
+            "(max-width: 768px)": function() {
+                // Simplified animations for mobile
+                gsap.from('.collection-item, .testimonial-card, .whats-new-slide, .gallery-item', {
+                    opacity: 0,
+                    y: 30,
+                    duration: 0.6,
+                    stagger: 0.1,
+                    ease: "power1.out",
+                    scrollTrigger: {
+                        trigger: '.collections-grid, .testimonial-grid, .whats-new-carousel, .gallery-grid',
+                        start: 'top bottom-=50',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+
+                gsap.from('.video-main, .model-container, .controls-container', {
+                    opacity: 0,
+                    y: 30,
+                    duration: 0.6,
+                    ease: "power1.out",
+                    scrollTrigger: {
+                        trigger: '.video-showcase, .virtual-try-on',
+                        start: 'top bottom-=50',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
+
+                gsap.from('.site-footer', {
+                    opacity: 0,
+                    duration: 0.6,
+                    scrollTrigger: {
+                        trigger: '.site-footer',
+                        start: 'top bottom',
+                        toggleActions: 'play none none reverse'
+                    }
+                });
             }
         });
-
-        // Featured Collections Animation
-        gsap.from('.collection-item', {
-            opacity: 0,
-            y: 50,
-            duration: 1,
-            stagger: 0.2,
-            scrollTrigger: {
-                trigger: '.collections-grid',
-                start: 'top bottom-=100',
-                toggleActions: 'play none none reverse'
-            }
-        });
-
-        // Virtual Try-On Section Animation
-        gsap.from('.model-container', {
-            x: -100,
-            opacity: 0,
-            duration: 1,
-            scrollTrigger: {
-                trigger: '.virtual-try-on',
-                start: 'top center',
-                toggleActions: 'play none none reverse'
-            }
-        });
-
-        gsap.from('.controls-container', {
-            x: 100,
-            opacity: 0,
-            duration: 1,
-            scrollTrigger: {
-                trigger: '.virtual-try-on',
-                start: 'top center',
-                toggleActions: 'play none none reverse'
-            }
-        });
-
-        // Testimonials Animation
-        gsap.from('.testimonial-card', {
-            opacity: 0,
-            y: 50,
-            duration: 1,
-            stagger: 0.2,
-            scrollTrigger: {
-                trigger: '.testimonial-grid',
-                start: 'top bottom-=100',
-                toggleActions: 'play none none reverse'
-            }
-        });
-
-        // Video Showcase Animation
-        gsap.from('.video-main', {
-            scale: 0.8,
-            opacity: 0,
-            duration: 1,
-            scrollTrigger: {
-                trigger: '.video-showcase',
-                start: 'top center',
-                toggleActions: 'play none none reverse'
-            }
-        });
-
-        gsap.utils.toArray('.timeline-item').forEach((item, index) => {
-            gsap.from(item, {
-                opacity: 0,
-                x: index % 2 === 0 ? -50 : 50,
-                duration: 1,
-                scrollTrigger: {
-                    trigger: item,
-                    start: 'top bottom-=50',
-                    toggleActions: 'play none none reverse'
-                }
-            });
-        });
-
-        // What's New Section Animation
-        gsap.from('.whats-new-slide', {
-            opacity: 0,
-            y: 50,
-            duration: 1,
-            stagger: 0.2,
-            scrollTrigger: {
-                trigger: '.whats-new-carousel',
-                start: 'top bottom-=100',
-                toggleActions: 'play none none reverse'
-            }
-        });
-
-        // Fashion Fusion Gallery Animation
-        gsap.from('.gallery-item', {
-            opacity: 0,
-            y: 50,
-            duration: 1,
-            stagger: 0.2,
-            scrollTrigger: {
-                trigger: '.gallery-grid',
-                start: 'top bottom-=100',
-                toggleActions: 'play none none reverse'
-            }
-        });
-
-        // Footer Animation
-        gsap.from('.site-footer', {
-            opacity: 0,
-            y: 50,
-            duration: 1,
-            scrollTrigger: {
-                trigger: '.site-footer',
-                start: 'top bottom',
-                toggleActions: 'play none none reverse'
-            }
-        });
-    }
-
-    // Newsletter form submission
-    function initializeNewsletterForm() {
-        const newsletterForm = document.querySelector('.newsletter-form');
-        newsletterForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = newsletterForm.querySelector('input[type="email"]').value;
-            // Here you would typically send the email to your server
-            console.log(`Newsletter sign-up: ${email}`);
-            alert('Thank you for subscribing to our newsletter!');
-            newsletterForm.reset();
-        });
-    }
-
-    // Dynamic year in footer
-    function updateFooterYear() {
-        const currentYearSpan = document.querySelector('.current-year');
-        if (currentYearSpan) {
-            currentYearSpan.textContent = new Date().getFullYear();
-        }
     }
 
     // Lazy loading images
@@ -548,30 +588,42 @@ document.addEventListener('DOMContentLoaded', function() {
         lazyImages.forEach(img => lazyLoadObserver.observe(img));
     }
 
-
- 
-
     // Mobile scroll interactions
     function initializeMobileScrollInteractions() {
-        if (window.innerWidth <= 768) { // Apply only on mobile devices
+        if (isMobile) {
             const interactiveElements = document.querySelectorAll('.collection-item, .gallery-item, .whats-new-content, .testimonial-card');
             
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('mobile-hover');
-                        // Remove the class after animation completes
                         setTimeout(() => {
                             entry.target.classList.remove('mobile-hover');
-                        }, 1000); // Adjust timing as needed
+                        }, 1000);
                     }
                 });
             }, {
-                threshold: 0.5 // Trigger when 50% of the element is visible
+                threshold: 0.5
             });
 
             interactiveElements.forEach(el => observer.observe(el));
         }
+    }
+
+    // Debounce function for scroll events
+    function debounce(func, wait = 20, immediate = true) {
+        let timeout;
+        return function() {
+            const context = this, args = arguments;
+            const later = function() {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+            const callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+        };
     }
 
     // Initialize all functions
@@ -586,12 +638,13 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeWhatsNewCarousel();
         initializeFashionFusionGallery();
         initializeScrollAnimations();
-        initializeNewsletterForm();
-        updateFooterYear();
         initializeLazyLoading();
-        initializeScrollToTop();
-        initializeThemeSwitcher();
         initializeMobileScrollInteractions();
+
+        // Add debounced scroll event listener
+        window.addEventListener('scroll', debounce(() => {
+            // Any additional scroll handling code can go here
+        }));
     }
 
     // Run the loader animation, then initialize the website
